@@ -462,8 +462,9 @@
 
       function setupActions() {
         qsa('[data-track-event]').forEach(btn => btn.addEventListener('click', () => {
-          const props = datasetProps(btn.dataset);
-          const eventName = props.trackEvent;
+          const eventName = btn.dataset.trackEvent;
+           const props = datasetProps(btn.dataset);
+          delete props.track_event;
           delete props.trackEvent;
           trackEvent(eventName, props);
         }));
