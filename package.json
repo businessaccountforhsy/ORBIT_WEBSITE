@@ -1,0 +1,10 @@
+{
+  "name": "orbit-braze-audited-site",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Fictional ORBIT lifecycle CRM experiment site with Netlify Functions and Braze users/track integration.",
+  "scripts": {
+    "dev": "netlify dev",
+    "test:functions": "node -c netlify/functions/_shared.js && node -c netlify/functions/orbit-waitlist.js && node -c netlify/functions/orbit-event.js"
+  }
+}

@@ -1,0 +1,642 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ORBIT — Stories, memberships, drops, live events, rewards</title>
+  <meta name="description" content="ORBIT is a fictional K-content service concept built for a student portfolio test." />
+  <style>
+    :root {
+      --bg: #f4f2ee;
+      --paper: #fbfaf7;
+      --ink: #141414;
+      --muted: #67625b;
+      --line: #d4d0c9;
+      --line-dark: #242424;
+      --soft: #ebe8e1;
+      --charcoal: #1d1d1b;
+      --white: #fffefa;
+      --danger: #6f2f2f;
+      --ok: #2f553c;
+      --sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      --serif: Georgia, "Times New Roman", serif;
+      --mono: "Courier New", Courier, monospace;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 16px;
+      line-height: 1.45;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; text-underline-offset: 4px; }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+    .shell { width: min(1180px, calc(100% - 36px)); margin: 0 auto; }
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(244, 242, 238, .94);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(10px);
+    }
+    .nav {
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+    .brand {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 10px;
+      text-decoration: none;
+      letter-spacing: -.02em;
+    }
+    .brand-mark {
+      width: 31px;
+      height: 31px;
+      border: 1.5px solid var(--ink);
+      border-radius: 999px;
+      display: inline-grid;
+      place-items: center;
+      font-family: var(--serif);
+      font-size: 18px;
+      line-height: 1;
+    }
+    .brand strong { font-size: 17px; letter-spacing: .03em; }
+    .brand span:last-child { color: var(--muted); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; }
+    .navlinks { display: flex; align-items: center; gap: 18px; font-size: 14px; color: var(--muted); }
+    .navlinks a { text-decoration: none; }
+    .navlinks a:hover { color: var(--ink); }
+    .mobile-hide { display: flex; }
+    .btn {
+      appearance: none;
+      border: 1px solid var(--ink);
+      border-radius: 0;
+      background: var(--ink);
+      color: var(--white);
+      min-height: 44px;
+      padding: 0 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      text-decoration: none;
+      transition: transform .14s ease, background .14s ease, color .14s ease, border-color .14s ease;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn.ghost { background: transparent; color: var(--ink); }
+    .btn.ghost:hover { background: var(--ink); color: var(--white); }
+    .btn.light { background: var(--white); color: var(--ink); border-color: var(--white); }
+    .btn.small { min-height: 36px; padding: 0 12px; font-size: 13px; }
+    .btn.full { width: 100%; }
+    .hero { padding: 78px 0 54px; border-bottom: 1px solid var(--line); }
+    .hero-grid { display: grid; grid-template-columns: 1.15fr .85fr; gap: 34px; align-items: stretch; }
+    .kicker { font-size: 12px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); margin: 0 0 18px; }
+    h1, h2, h3 { margin: 0; font-weight: 500; letter-spacing: -.045em; }
+    h1 { font-family: var(--serif); font-size: clamp(52px, 9vw, 112px); line-height: .92; max-width: 870px; }
+    h2 { font-family: var(--serif); font-size: clamp(34px, 5vw, 62px); line-height: .98; }
+    h3 { font-size: 21px; line-height: 1.08; }
+    p { margin: 0; }
+    .lead { margin-top: 24px; max-width: 665px; color: var(--muted); font-size: 18px; }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 30px; }
+    .note { font-size: 13px; color: var(--muted); max-width: 630px; margin-top: 16px; }
+    .hero-card {
+      background: var(--charcoal);
+      color: var(--white);
+      min-height: 520px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border: 1px solid var(--charcoal);
+    }
+    .poster { border: 1px solid #56534e; padding: 18px; min-height: 260px; display: grid; align-content: end; background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.00)); }
+    .poster-title { font-family: var(--serif); font-size: 48px; line-height: .94; letter-spacing: -.04em; }
+    .poster-meta { display: flex; justify-content: space-between; gap: 16px; color: #c7c1b5; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 18px; }
+    .hero-card-bottom { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .mini-stat { border-top: 1px solid #56534e; padding-top: 12px; }
+    .mini-stat strong { display: block; font-family: var(--serif); font-size: 30px; line-height: 1; margin-bottom: 6px; font-weight: 400; }
+    .mini-stat span { font-size: 12px; color: #c7c1b5; }
+    section { padding: 72px 0; border-bottom: 1px solid var(--line); }
+    .section-head { display: grid; grid-template-columns: .55fr 1fr; gap: 30px; align-items: end; margin-bottom: 28px; }
+    .section-head p { color: var(--muted); max-width: 720px; }
+    .grid { display: grid; gap: 16px; }
+    .grid.five { grid-template-columns: repeat(5, 1fr); }
+    .grid.three { grid-template-columns: repeat(3, 1fr); }
+    .grid.two { grid-template-columns: repeat(2, 1fr); }
+    .surface-card, .card, .form-panel, .profile-panel, .line-panel {
+      background: var(--paper);
+      border: 1px solid var(--line);
+    }
+    .surface-card { min-height: 235px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; }
+    .surface-card .number { font-family: var(--serif); color: var(--muted); font-size: 18px; }
+    .surface-card p { color: var(--muted); font-size: 14px; margin-top: 12px; }
+    .tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 18px; }
+    .tag { border: 1px solid var(--line); background: var(--soft); padding: 5px 8px; font-size: 12px; color: #4d4943; }
+    .card { padding: 18px; min-height: 265px; display: flex; flex-direction: column; justify-content: space-between; }
+    .meta-line { display: flex; justify-content: space-between; gap: 14px; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 16px; }
+    .card p { color: var(--muted); margin: 12px 0 22px; }
+    .card-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: auto; }
+    .block-dark { background: var(--charcoal); color: var(--white); padding: 32px; min-height: 390px; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid var(--charcoal); }
+    .block-dark p { color: #cfc8bc; max-width: 600px; }
+    .block-dark .btn.ghost { color: var(--white); border-color: #eae4d8; }
+    .block-dark .btn.ghost:hover { background: var(--white); color: var(--ink); }
+    .profile-panel { padding: 22px; }
+    .form-panel { padding: 22px; }
+    .field-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    label { display: block; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 7px; }
+    input, select {
+      width: 100%;
+      border: 1px solid var(--line-dark);
+      background: var(--white);
+      color: var(--ink);
+      min-height: 44px;
+      padding: 0 11px;
+      border-radius: 0;
+    }
+    input:focus, select:focus { outline: 2px solid #b9b4aa; outline-offset: 1px; }
+    .check { display: grid; grid-template-columns: 18px 1fr; gap: 10px; align-items: start; font-size: 13px; color: var(--muted); letter-spacing: 0; text-transform: none; margin: 12px 0 0; }
+    .check input { width: 18px; min-height: 18px; margin: 1px 0 0; }
+    .form-status { margin-top: 14px; padding: 12px; border: 1px solid var(--line); font-size: 13px; color: var(--muted); background: var(--soft); }
+    .form-status.ok { color: var(--ok); border-color: #8aa28f; background: #edf1ea; }
+    .form-status.err { color: var(--danger); border-color: #ad8a8a; background: #f2e9e6; }
+    .tiny-note { font-size: 12px; color: var(--muted); margin-top: 10px; }
+    .cart-box, .mission-box { background: var(--charcoal); color: var(--white); padding: 20px; border: 1px solid var(--charcoal); }
+    .cart-box p, .mission-box p { color: #cfc8bc; font-size: 14px; margin-top: 8px; }
+    .cart-count { font-family: var(--serif); font-size: 56px; line-height: 1; margin-top: 28px; }
+    .line-panel { padding: 20px; display: grid; gap: 14px; }
+    .line-item { border-top: 1px solid var(--line); padding-top: 14px; display: flex; justify-content: space-between; gap: 20px; color: var(--muted); }
+    .line-item:first-child { border-top: 0; padding-top: 0; }
+    .line-item strong { color: var(--ink); font-weight: 500; }
+    .passport-summary { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 16px; }
+    .modal-backdrop { position: fixed; inset: 0; z-index: 80; background: rgba(15, 15, 15, .38); opacity: 0; pointer-events: none; transition: opacity .16s ease; }
+    .modal-backdrop.open { opacity: 1; pointer-events: auto; }
+    .modal { position: fixed; top: 0; right: 0; bottom: 0; width: min(520px, 100%); background: var(--paper); border-left: 1px solid var(--line-dark); z-index: 90; transform: translateX(104%); transition: transform .2s ease; overflow: auto; }
+    .modal.open { transform: translateX(0); }
+    .modal-head { padding: 20px; display: flex; justify-content: space-between; align-items: start; gap: 16px; border-bottom: 1px solid var(--line); }
+    .modal-body { padding: 20px; display: grid; gap: 18px; }
+    .choice-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .choice { border: 1px solid var(--line); padding: 10px; display: grid; grid-template-columns: 18px 1fr; gap: 8px; align-items: start; color: var(--ink); text-transform: none; letter-spacing: 0; font-size: 14px; margin: 0; background: var(--white); }
+    .choice input { width: 16px; min-height: 16px; }
+    .toast { position: fixed; right: 18px; bottom: 18px; z-index: 110; background: var(--charcoal); color: var(--white); padding: 12px 14px; border: 1px solid #555; max-width: 320px; font-size: 13px; display: none; }
+    .toast.show { display: block; }
+    .debug-panel { display: none; position: fixed; left: 18px; bottom: 18px; z-index: 95; width: min(560px, calc(100vw - 36px)); background: #111; color: #eee; border: 1px solid #555; box-shadow: 0 18px 50px rgba(0,0,0,.28); }
+    .debug-panel.open { display: block; }
+    .debug-head { padding: 12px; border-bottom: 1px solid #555; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+    .debug-body { max-height: 280px; overflow: auto; padding: 12px; }
+    .debug-body pre { margin: 0; white-space: pre-wrap; font-family: var(--mono); font-size: 11px; color: #ddd; }
+    footer { padding: 38px 0; color: var(--muted); font-size: 13px; }
+    .footer-row { display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+    .hidden { display: none !important; }
+    @media (max-width: 900px) {
+      .hero-grid, .section-head, .grid.two, .grid.three, .grid.five { grid-template-columns: 1fr; }
+      .mobile-hide { display: none; }
+      .hero-card { min-height: 420px; }
+      .field-grid { grid-template-columns: 1fr; }
+      .choice-grid { grid-template-columns: 1fr; }
+      .navlinks { gap: 10px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="shell nav">
+      <a class="brand" href="#top" aria-label="ORBIT home"><span class="brand-mark">O</span><strong>ORBIT</strong><span>fictional concept</span></a>
+      <nav class="navlinks mobile-hide" aria-label="Main navigation">
+        <a href="#stories">Stories</a>
+        <a href="#pass">Pass</a>
+        <a href="#market">Market</a>
+        <a href="#live">Live</a>
+        <a href="#rewards">Rewards</a>
+      </nav>
+      <a class="btn small" href="#join">Join early access</a>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="shell hero-grid">
+        <div>
+          <p class="kicker">K-content · memberships · drops · live moments</p>
+          <h1>Find the next story before it gets loud.</h1>
+          <p class="lead">ORBIT is a fictional mobile service concept where serialized stories, creator memberships, limited drops, pop-up moments, and rewards live in one place.</p>
+          <div class="hero-actions">
+            <a class="btn" href="#join">Join early access</a>
+            <button class="btn ghost" type="button" data-open-passport>Set preferences</button>
+          </div>
+          <p class="note">Built as a student portfolio concept. No password, payment, or real product account is created. Early access submissions may be used to test a short onboarding email flow.</p>
+        </div>
+        <aside class="hero-card" aria-label="Featured ORBIT issue">
+          <div class="poster">
+            <div class="poster-meta"><span>Issue 00</span><span>soft launch</span></div>
+            <div class="poster-title">Blackout Broadcast</div>
+          </div>
+          <div>
+            <p style="color:#cfc8bc;margin:18px 0 22px;">A late-night creator stream becomes a clue trail when every viewer receives the same impossible message.</p>
+            <div class="hero-card-bottom">
+              <div class="mini-stat"><strong>05</strong><span>service surfaces</span></div>
+              <div class="mini-stat"><strong>07</strong><span>days of onboarding</span></div>
+              <div class="mini-stat"><strong>0</strong><span>passwords needed</span></div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section id="surface">
+      <div class="shell">
+        <div class="section-head">
+          <div><p class="kicker">Service map</p><h2>Five ways into ORBIT.</h2></div>
+          <p>The site is organized around the same surfaces a member would see in the app: stories, membership, creator drops, live moments, and rewards.</p>
+        </div>
+        <div class="grid five">
+          <article class="surface-card"><div><div class="number">01</div><h3>Stories</h3><p>Short serialized previews, creator worlds, and saved writers.</p></div><div class="tag-row"><span class="tag">Preview</span><span class="tag">Save</span></div></article>
+          <article class="surface-card"><div><div class="number">02</div><h3>Pass</h3><p>Member notes, early drops, and a lighter path into subscriptions.</p></div><div class="tag-row"><span class="tag">Benefits</span><span class="tag">Invite</span></div></article>
+          <article class="surface-card"><div><div class="number">03</div><h3>Market</h3><p>Fictional creator objects, printed extras, and member-only drops.</p></div><div class="tag-row"><span class="tag">Drop</span><span class="tag">Cart</span></div></article>
+          <article class="surface-card"><div><div class="number">04</div><h3>Live</h3><p>Pop-up rooms, online talks, and RSVP moments.</p></div><div class="tag-row"><span class="tag">RSVP</span><span class="tag">Reminder</span></div></article>
+          <article class="surface-card"><div><div class="number">05</div><h3>Rewards</h3><p>Small missions that make first-week discovery feel less random.</p></div><div class="tag-row"><span class="tag">Mission</span><span class="tag">Badge</span></div></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="stories">
+      <div class="shell">
+        <div class="section-head">
+          <div><p class="kicker">Stories</p><h2>Start with a preview.</h2></div>
+          <p>Choose a short piece, save a creator, or let ORBIT remember what kinds of worlds feel worth returning to.</p>
+        </div>
+        <div class="grid three">
+          <article class="card"><div><div class="meta-line"><span>Thriller · 7 min</span><span>New</span></div><h3>Blackout Broadcast</h3><p>A late-night creator stream turns into a clue trail when every viewer receives the same impossible message.</p></div><div class="card-actions"><button class="btn small" type="button" data-track-event="view_story" data-story-id="blackout_broadcast" data-story-genre="thriller">Preview story</button><button class="btn ghost small" type="button" data-track-event="save_creator" data-creator-id="studio_nightglass">Save creator</button></div></article>
+          <article class="card"><div><div class="meta-line"><span>Romance · 5 min</span><span>Soft launch</span></div><h3>Room for Rain</h3><p>Two fans keep missing each other at the same pop-up event until a shared member note gives them one more chance.</p></div><div class="card-actions"><button class="btn small" type="button" data-track-event="view_story" data-story-id="room_for_rain" data-story-genre="romance">Preview story</button><button class="btn ghost small" type="button" data-track-event="save_creator" data-creator-id="neon_letterpress">Save creator</button></div></article>
+          <article class="card"><div><div class="meta-line"><span>Healing · 4 min</span><span>Editor pick</span></div><h3>Soft Reset Club</h3><p>A small group meets every Sunday to trade unfinished drafts, old badges, and quieter ways to start over.</p></div><div class="card-actions"><button class="btn small" type="button" data-track-event="view_story" data-story-id="soft_reset_club" data-story-genre="healing">Preview story</button><button class="btn ghost small" type="button" data-track-event="save_creator" data-creator-id="reset_room">Save creator</button></div></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="join">
+      <div class="shell grid two">
+        <div class="profile-panel">
+          <p class="kicker">Early access</p>
+          <h2>Tell ORBIT what to send first.</h2>
+          <p style="color:var(--muted);margin-top:18px;">Leave an email, choose your first content lane, and set a message rhythm. ORBIT uses those choices to keep first-week emails relevant and limited.</p>
+          <div class="passport-summary" id="passportSummary" aria-live="polite"></div>
+          <button class="btn ghost" type="button" style="margin-top:20px;" data-open-passport>Change preferences</button>
+        </div>
+        <form id="waitlistForm" name="orbit-waitlist" class="form-panel" method="POST" data-netlify="true" netlify-honeypot="bot-field" action="/thanks.html">
+          <input type="hidden" name="form-name" value="orbit-waitlist" />
+          <p class="hidden"><label>Do not fill this out <input name="bot-field" /></label></p>
+          <input type="hidden" id="selected_interests" name="selected_interests" />
+          <input type="hidden" id="tone_preference" name="tone_preference" />
+          <input type="hidden" id="format_preference" name="format_preference" />
+          <input type="hidden" id="utm_source" name="utm_source" />
+          <input type="hidden" id="utm_medium" name="utm_medium" />
+          <input type="hidden" id="utm_campaign" name="utm_campaign" />
+          <input type="hidden" id="utm_content" name="utm_content" />
+          <input type="hidden" id="source" name="source" />
+          <input type="hidden" id="referrer" name="referrer" />
+          <input type="hidden" id="landing_url" name="landing_url" />
+          <div class="field-grid">
+            <div><label for="email">Email address</label><input id="email" name="email" type="email" autocomplete="email" required placeholder="you@example.com" /></div>
+            <div><label for="display_name">Display name</label><input id="display_name" name="display_name" type="text" autocomplete="name" maxlength="80" placeholder="What should ORBIT call you?" /></div>
+            <div><label for="first_content_preference">First content preference</label><select id="first_content_preference" name="first_content_preference"><option value="thriller">Thriller / mystery</option><option value="romance">Romance / drama</option><option value="healing">Healing / slice of life</option><option value="fantasy">Action / fantasy</option><option value="behind_the_scenes">Creator behind-the-scenes</option></select></div>
+            <div><label for="email_rhythm">Email rhythm</label><select id="email_rhythm" name="email_rhythm"><option value="3_over_7_days">Up to 3 emails over 7 days</option><option value="important_only">Important updates only</option><option value="one_email_only">One email only</option></select></div>
+          </div>
+          <label class="check"><input id="email_marketing_opt_in" name="email_marketing_opt_in" type="checkbox" required /> <span>I agree to receive a short ORBIT onboarding email sequence for this portfolio test. I can unsubscribe at any time.</span></label>
+          <label class="check"><input id="project_acknowledgement" name="project_acknowledgement" type="checkbox" required /> <span>I understand ORBIT is a fictional student portfolio concept, not a launched product.</span></label>
+          <button class="btn full" type="submit" style="margin-top:18px;">Join the early access list</button>
+          <div id="formStatus" class="form-status" role="status" aria-live="polite">Ready.</div>
+          <p class="tiny-note">No password, payment, or real product account is created. Read the <a href="privacy.html">privacy note</a>.</p>
+        </form>
+      </div>
+    </section>
+
+    <section id="pass">
+      <div class="shell grid two">
+        <div class="block-dark">
+          <div><p class="kicker" style="color:#cfc8bc;">ORBIT Pass</p><h2>Membership should arrive after the first story clicks.</h2><p style="margin-top:18px;">Pass is designed for people who already found something worth following: early notes, limited drops, quiet reminders, and first access to live moments.</p></div>
+          <div class="card-actions"><button class="btn light" type="button" data-track-event="click_membership_cta" data-cta-location="pass_panel">See Pass benefits</button><button class="btn ghost" type="button" data-track-event="request_pass_invite" data-cta-location="pass_panel">Request invite</button></div>
+        </div>
+        <div class="line-panel">
+          <div class="line-item"><strong>Early notes</strong><span>creator context before public drops</span></div>
+          <div class="line-item"><strong>Member drops</strong><span>small fictional goods tied to story worlds</span></div>
+          <div class="line-item"><strong>Live windows</strong><span>RSVP reminders for pop-up and online sessions</span></div>
+          <div class="line-item"><strong>Reward paths</strong><span>missions that do not rely on daily spam</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="market">
+      <div class="shell">
+        <div class="section-head">
+          <div><p class="kicker">Market</p><h2>Small drops from story worlds.</h2></div>
+          <p>These are fictional products for the ORBIT concept. The bag is a local preview only; there is no checkout.</p>
+        </div>
+        <div class="grid three">
+          <article class="card"><div><div class="meta-line"><span>Limited zine</span><span>$18 concept</span></div><h3>Blackout Broadcast Casebook</h3><p>A printed clue archive from the thriller line.</p></div><div class="card-actions"><button class="btn small" type="button" data-track-event="view_market_drop" data-product-id="blackout_casebook">View drop</button><button class="btn ghost small" type="button" data-add-cart data-product-id="blackout_casebook" data-product-name="Blackout Broadcast Casebook">Add to cart</button></div></article>
+          <article class="card"><div><div class="meta-line"><span>Creator object</span><span>$24 concept</span></div><h3>Soft Reset Pin Set</h3><p>Three small badges tied to weekly missions and creator notes.</p></div><div class="card-actions"><button class="btn small" type="button" data-track-event="view_market_drop" data-product-id="soft_reset_pins">View drop</button><button class="btn ghost small" type="button" data-add-cart data-product-id="soft_reset_pins" data-product-name="Soft Reset Pin Set">Add to cart</button></div></article>
+          <aside class="cart-box"><p class="kicker" style="color:#cfc8bc;">Bag preview</p><div class="cart-count" id="cartCount">0</div><p id="cartText">No items added in this browser.</p><button class="btn light small" type="button" id="clearCartBtn" style="margin-top:18px;">Clear bag</button></aside>
+        </div>
+      </div>
+    </section>
+
+    <section id="live">
+      <div class="shell">
+        <div class="section-head">
+          <div><p class="kicker">Live</p><h2>RSVP to a fictional room.</h2></div>
+          <p>ORBIT Live keeps pop-up and online event interest in one place, without asking for a full account first.</p>
+        </div>
+        <div class="grid two">
+          <article class="card"><div><div class="meta-line"><span>Seoul · fictional</span><span>June window</span></div><h3>Late Night Reading Room</h3><p>A small pop-up for thriller previews, creator notes, and member badges.</p></div><div class="card-actions"><button class="btn small" type="button" data-track-event="view_live_event" data-event-id="late_night_reading_room" data-city="seoul">View event</button><button class="btn ghost small" type="button" data-track-event="rsvp_popup" data-event-id="late_night_reading_room" data-city="seoul">RSVP interest</button></div></article>
+          <article class="card"><div><div class="meta-line"><span>Online · fictional</span><span>Sunday</span></div><h3>Creator Table Talk</h3><p>A live-streamed session around drafts, ending choices, and first-week reading missions.</p></div><div class="card-actions"><button class="btn small" type="button" data-track-event="view_live_event" data-event-id="creator_table_talk" data-city="online">View event</button><button class="btn ghost small" type="button" data-track-event="rsvp_popup" data-event-id="creator_table_talk" data-city="online">RSVP interest</button></div></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="rewards">
+      <div class="shell grid two">
+        <div>
+          <p class="kicker">Rewards</p>
+          <h2>A quieter way to return.</h2>
+          <p class="lead" style="font-size:17px;">Rewards are small missions around reading, saving, and visiting. They are meant to support discovery instead of pushing every possible alert.</p>
+        </div>
+        <div class="grid">
+          <article class="card"><div><div class="meta-line"><span>Mission 01</span><span>First week</span></div><h3>Preview one story and save one creator</h3><p>Finish a small loop before deciding whether ORBIT Pass is relevant.</p></div><div class="card-actions"><button class="btn small" type="button" data-track-event="view_reward_mission" data-mission-id="first_week_preview">View mission</button><button class="btn ghost small" type="button" data-complete-mission data-mission-id="first_week_preview">Complete mission</button></div></article>
+          <aside class="mission-box"><p class="kicker" style="color:#cfc8bc;">Local mission state</p><div class="cart-count" id="missionCount">0</div><p id="missionText">No missions completed in this browser.</p></aside>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="modal-backdrop" id="passportBackdrop" aria-hidden="true"></div>
+  <aside class="modal" id="passportModal" role="dialog" aria-modal="true" aria-labelledby="passportTitle">
+    <div class="modal-head">
+      <div><p class="kicker">Preference Passport</p><h3 id="passportTitle">Choose how ORBIT should speak to you.</h3></div>
+      <button class="btn ghost small" type="button" data-close-passport>Close</button>
+    </div>
+    <div class="modal-body">
+      <section style="padding:0;border:0;"><p class="kicker">Content interests</p><div class="choice-grid">
+        <label class="choice"><input type="checkbox" name="interest" value="stories" />Story previews</label>
+        <label class="choice"><input type="checkbox" name="interest" value="creators" />Creator notes</label>
+        <label class="choice"><input type="checkbox" name="interest" value="drops" />Member drops</label>
+        <label class="choice"><input type="checkbox" name="interest" value="live" />Live events</label>
+        <label class="choice"><input type="checkbox" name="interest" value="rewards" />Missions and rewards</label>
+      </div></section>
+      <section style="padding:0;border:0;"><p class="kicker">Tone</p><select id="passportTone"><option value="quiet_direct">Quiet and direct</option><option value="editorial">Editorial</option><option value="friendly">Friendly</option><option value="minimal">Minimal</option></select></section>
+      <section style="padding:0;border:0;"><p class="kicker">Preferred format</p><select id="passportFormat"><option value="story_preview">Story preview first</option><option value="creator_note">Creator note first</option><option value="drop_digest">Drop digest</option><option value="event_reward">Event and reward digest</option></select></section>
+      <button class="btn" type="button" id="savePassportBtn">Save preferences</button>
+      <p class="tiny-note">Saved preferences are attached to the early access form when you submit it.</p>
+    </div>
+  </aside>
+
+  <section id="debugPanel" class="debug-panel" aria-label="Local Event Log">
+    <div class="debug-head"><div><strong>Local Event Log</strong><div style="font-size:12px;color:#bbb;">Admin QA only. Clearing this removes browser logs only, not form or CRM data already sent.</div></div><div style="display:flex;gap:6px;"><button id="copyLogBtn" class="btn light small" type="button">Copy</button><button id="clearLogBtn" class="btn light small" type="button">Clear this browser only</button></div></div>
+    <div class="debug-body"><pre id="eventLogOutput">[]</pre></div>
+  </section>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <footer>
+    <div class="shell footer-row">
+      <p>ORBIT is a fictional student portfolio concept.</p>
+      <p><a href="privacy.html">Privacy note</a> · No passwords · No checkout · No real product account</p>
+    </div>
+  </footer>
+
+  <script>
+    (() => {
+      const qs = (s, root = document) => root.querySelector(s);
+      const qsa = (s, root = document) => Array.from(root.querySelectorAll(s));
+      const params = new URLSearchParams(location.search);
+      const debug = params.get('debug') === 'orbit-admin';
+      const STORAGE_LOG = 'orbit_local_event_log_public_v5';
+      const STORAGE_PROFILE = 'orbit_profile_public_v5';
+      const STORAGE_PREFS = 'orbit_preferences_public_v5';
+      const STORAGE_CART = 'orbit_cart_public_v5';
+      const STORAGE_MISSIONS = 'orbit_missions_public_v5';
+
+      let prefs = loadJson(STORAGE_PREFS, { interests: ['stories'], tone: 'quiet_direct', format: 'story_preview', rhythm: '3_over_7_days' });
+      let cart = loadJson(STORAGE_CART, []);
+      let missions = loadJson(STORAGE_MISSIONS, []);
+      let profile = loadJson(STORAGE_PROFILE, null);
+
+      document.addEventListener('DOMContentLoaded', init);
+
+      function init() {
+        fillTrackingFields();
+        setupPassport();
+        setupActions();
+        renderPrefs();
+        renderCart();
+        renderMissions();
+        setupDebug();
+      }
+
+      function setupPassport() {
+        qsa('[data-open-passport]').forEach(btn => btn.addEventListener('click', openPassport));
+        qsa('[data-close-passport]').forEach(btn => btn.addEventListener('click', closePassport));
+        qs('#passportBackdrop').addEventListener('click', closePassport);
+        document.addEventListener('keydown', e => { if (e.key === 'Escape' && qs('#passportModal').classList.contains('open')) closePassport(); });
+        qs('#passportTone').value = prefs.tone || 'quiet_direct';
+        qs('#passportFormat').value = prefs.format || 'story_preview';
+        qsa('input[name="interest"]').forEach(input => { input.checked = (prefs.interests || []).includes(input.value); });
+        qs('#savePassportBtn').addEventListener('click', savePassport);
+        qs('#email_rhythm').value = prefs.rhythm || '3_over_7_days';
+        qs('#email_rhythm').addEventListener('change', e => { prefs.rhythm = e.target.value; saveJson(STORAGE_PREFS, prefs); renderPrefs(); });
+      }
+
+      function setupActions() {
+        qsa('[data-track-event]').forEach(btn => btn.addEventListener('click', () => {
+          const props = datasetProps(btn.dataset);
+          const eventName = props.trackEvent;
+          delete props.trackEvent;
+          trackEvent(eventName, props);
+        }));
+        qsa('[data-add-cart]').forEach(btn => btn.addEventListener('click', () => addToCart(btn.dataset.productId, btn.dataset.productName)));
+        qsa('[data-complete-mission]').forEach(btn => btn.addEventListener('click', () => completeMission(btn.dataset.missionId)));
+        qs('#clearCartBtn').addEventListener('click', () => { cart = []; saveJson(STORAGE_CART, cart); renderCart(); showToast('Bag cleared in this browser.'); });
+        qs('#waitlistForm').addEventListener('submit', submitWaitlist);
+        qs('#clearLogBtn')?.addEventListener('click', () => { localStorage.removeItem(STORAGE_LOG); renderLog(); });
+        qs('#copyLogBtn')?.addEventListener('click', async () => { await navigator.clipboard.writeText(JSON.stringify(loadLog(), null, 2)); showToast('Local log copied.'); });
+      }
+
+      async function submitWaitlist(e) {
+        e.preventDefault();
+        const form = e.currentTarget;
+        const statusBox = qs('#formStatus');
+        statusBox.className = 'form-status';
+        statusBox.textContent = 'Submitting...';
+        syncHiddenPreferenceFields();
+        const data = Object.fromEntries(new FormData(form).entries());
+        data.email_marketing_opt_in = form.email_marketing_opt_in.checked;
+        data.project_acknowledgement = form.project_acknowledgement.checked;
+        data.selected_interests = prefs.interests || [];
+        data.tone_preference = prefs.tone;
+        data.format_preference = prefs.format;
+        data.email_rhythm = qs('#email_rhythm').value;
+        data.first_content_preference = qs('#first_content_preference').value;
+        logLocal('waitlist_submit_attempt', scrub(data));
+        submitNetlifyBackup(data).catch(err => logLocal('form_backup_error', { message: String(err.message || err) }));
+        try {
+          const res = await fetch('/api/waitlist', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+          const result = await res.json().catch(() => ({}));
+          if (!res.ok || !result.ok) throw new Error(result.error || `Submission failed with ${res.status}`);
+          profile = { email: data.email, external_id: result.external_id, saved_at: new Date().toISOString() };
+          saveJson(STORAGE_PROFILE, profile);
+          logLocal('waitlist_submitted', { external_id: result.external_id, dry_run: !!result.dry_run });
+          trackGA4('submit_waitlist', {
+            surface: 'early_access',
+            first_content_preference: data.first_content_preference,
+            email_rhythm: data.email_rhythm,
+            selected_interests: data.selected_interests || [],
+            selected_interests_count: Array.isArray(data.selected_interests) ? data.selected_interests.length : 0,
+            utm_source: data.utm_source || 'direct',
+            utm_medium: data.utm_medium || '',
+            utm_campaign: data.utm_campaign || ''
+          });
+          trackGA4('complete_preference_quiz', {
+            surface: 'preference_passport',
+            first_content_preference: data.first_content_preference,
+            email_rhythm: data.email_rhythm,
+            selected_interests: data.selected_interests || [],
+            selected_interests_count: Array.isArray(data.selected_interests) ? data.selected_interests.length : 0
+          });
+          statusBox.className = 'form-status ok';
+          statusBox.textContent = result.dry_run ? 'Saved in test mode.' : 'Submitted. Check your inbox if the onboarding flow is active.';
+          showToast('You are on the early access list.');
+        } catch (err) {
+          const msg = explainFetchError(err);
+          statusBox.className = 'form-status err';
+          statusBox.textContent = msg;
+          logLocal('waitlist_submit_error', { message: msg });
+        }
+      }
+
+      async function submitNetlifyBackup(data) {
+        const encoded = new URLSearchParams();
+        encoded.set('form-name', 'orbit-waitlist');
+        for (const [key, value] of Object.entries(data)) {
+          encoded.set(key, Array.isArray(value) ? value.join(',') : String(value ?? ''));
+        }
+        await fetch('/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: encoded.toString() });
+      }
+
+      function trackGA4(eventName, properties = {}) {
+        if (typeof window.gtag !== 'function') return;
+        const blocked = new Set(['email', 'display_name', 'name', 'phone', 'external_id']);
+        const safe = {};
+        Object.entries(properties || {}).forEach(([key, value]) => {
+          if (blocked.has(key)) return;
+          if (value === undefined || value === null || value === '') return;
+          if (Array.isArray(value)) {
+            safe[key] = value.join(',').slice(0, 100);
+            safe[`${key}_count`] = value.length;
+          } else if (typeof value === 'object') {
+            safe[key] = JSON.stringify(value).slice(0, 100);
+          } else {
+            safe[key] = value;
+          }
+        });
+        window.gtag('event', eventName, safe);
+      }
+
+      async function trackEvent(eventName, properties = {}) {
+        const payload = { event_name: eventName, properties, email: profile?.email, external_id: profile?.external_id };
+        logLocal(eventName, scrub(payload));
+        trackGA4(eventName, properties);
+        if (!profile?.email && !profile?.external_id) {
+          showToast('Saved in this browser. Join early access to attach actions to your profile.');
+          return;
+        }
+        try {
+          const res = await fetch('/api/event', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+          const result = await res.json().catch(() => ({}));
+          if (!res.ok || !result.ok) throw new Error(result.error || `Event request failed with ${res.status}`);
+          logLocal(eventName + '_sent', { external_id: result.external_id, dry_run: !!result.dry_run });
+          showToast('Saved.');
+        } catch (err) {
+          logLocal(eventName + '_send_error', { message: explainFetchError(err) });
+          showToast('Saved in this browser. Use the live site before collecting responses.');
+        }
+      }
+
+      function addToCart(productId, productName) {
+        cart.push({ product_id: productId, product_name: productName, added_at: new Date().toISOString() });
+        saveJson(STORAGE_CART, cart);
+        renderCart();
+        trackEvent('add_to_cart', { product_id: productId, product_name: productName, cart_size: cart.length });
+      }
+
+      function completeMission(missionId) {
+        if (!missions.includes(missionId)) missions.push(missionId);
+        saveJson(STORAGE_MISSIONS, missions);
+        renderMissions();
+        trackEvent('complete_mission', { mission_id: missionId, mission_count: missions.length });
+      }
+
+      function openPassport() { qs('#passportBackdrop').classList.add('open'); qs('#passportModal').classList.add('open'); }
+      function closePassport() { qs('#passportBackdrop').classList.remove('open'); qs('#passportModal').classList.remove('open'); }
+      function savePassport() {
+        prefs = {
+          interests: qsa('input[name="interest"]:checked').map(i => i.value),
+          tone: qs('#passportTone').value,
+          format: qs('#passportFormat').value,
+          rhythm: qs('#email_rhythm').value || '3_over_7_days'
+        };
+        if (!prefs.interests.length) prefs.interests = ['stories'];
+        saveJson(STORAGE_PREFS, prefs);
+        renderPrefs();
+        closePassport();
+        showToast('Preferences saved.');
+        const preferencePayload = { selected_interests: prefs.interests, tone_preference: prefs.tone, format_preference: prefs.format, email_rhythm: prefs.rhythm };
+        trackGA4('update_preference', preferencePayload);
+        if (profile?.email || profile?.external_id) trackEvent('update_preference', preferencePayload);
+        else logLocal('preferences_saved_locally', prefs);
+      }
+
+      function renderPrefs() {
+        syncHiddenPreferenceFields();
+        const summary = qs('#passportSummary');
+        if (!summary) return;
+        const items = [...(prefs.interests || []), prefs.tone, prefs.format, prefs.rhythm].filter(Boolean).map(labelFor);
+        summary.innerHTML = items.map(x => `<span class="tag">${escapeHtml(x)}</span>`).join('');
+      }
+      function renderCart() { qs('#cartCount').textContent = String(cart.length); qs('#cartText').textContent = cart.length ? `${cart.length} item${cart.length > 1 ? 's' : ''} added in this browser.` : 'No items added in this browser.'; }
+      function renderMissions() { qs('#missionCount').textContent = String(missions.length); qs('#missionText').textContent = missions.length ? `${missions.length} mission${missions.length > 1 ? 's' : ''} completed in this browser.` : 'No missions completed in this browser.'; }
+      function setupDebug() { if (debug) qs('#debugPanel').classList.add('open'); renderLog(); }
+      function renderLog() { const out = qs('#eventLogOutput'); if (out) out.textContent = JSON.stringify(loadLog(), null, 2); }
+      function logLocal(eventName, payload) { const logs = loadLog(); logs.unshift({ time: new Date().toISOString(), event: eventName, payload }); localStorage.setItem(STORAGE_LOG, JSON.stringify(logs.slice(0, 100))); renderLog(); }
+      function loadLog() { return loadJson(STORAGE_LOG, []); }
+
+      function fillTrackingFields() {
+        const source = sourceFromParams(params);
+        setField('utm_source', params.get('utm_source') || '');
+        setField('utm_medium', params.get('utm_medium') || '');
+        setField('utm_campaign', params.get('utm_campaign') || '');
+        setField('utm_content', params.get('utm_content') || '');
+        setField('source', source);
+        setField('referrer', document.referrer || '');
+        setField('landing_url', location.href);
+      }
+      function syncHiddenPreferenceFields() { setField('selected_interests', (prefs.interests || []).join(',')); setField('tone_preference', prefs.tone || ''); setField('format_preference', prefs.format || ''); }
+      function setField(id, value) { const el = qs('#' + id); if (el) el.value = value; }
+      function sourceFromParams(p) { const s = p.get('utm_source'); const m = p.get('utm_medium'); if (!s) return 'direct'; if (s === 'instagram' && m === 'story') return 'instagram_story'; if (s === 'reddit') return 'reddit_post'; return [s, m].filter(Boolean).join('_'); }
+      function datasetProps(ds) { const out = {}; for (const [key, value] of Object.entries(ds)) out[camelToSnake(key)] = value; return out; }
+      function camelToSnake(str) { return str.replace(/[A-Z]/g, m => '_' + m.toLowerCase()); }
+      function scrub(obj) { const copy = JSON.parse(JSON.stringify(obj || {})); if (copy.email) copy.email = copy.email.replace(/^(.{2}).*(@.*)$/, '$1***$2'); return copy; }
+      function explainFetchError(err) { const raw = String(err.message || err || ''); if (raw === 'Failed to fetch' || raw.includes('Failed to fetch')) return 'Submission is unavailable in this preview. Use the live site before collecting responses.'; return raw || 'Submission failed.'; }
+      function showToast(message) { const t = qs('#toast'); t.textContent = message; t.classList.add('show'); clearTimeout(showToast.timer); showToast.timer = setTimeout(() => t.classList.remove('show'), 2600); }
+      function loadJson(key, fallback) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; } catch (_) { return fallback; } }
+      function saveJson(key, value) { localStorage.setItem(key, JSON.stringify(value)); }
+      function labelFor(value) { const labels = { stories: 'Stories', creators: 'Creator notes', drops: 'Drops', live: 'Live events', rewards: 'Rewards', quiet_direct: 'Quiet, direct', editorial: 'Editorial', friendly: 'Friendly', minimal: 'Minimal', story_preview: 'Story preview', creator_note: 'Creator note', drop_digest: 'Drop digest', event_reward: 'Event and reward digest', '3_over_7_days': 'Up to 3 emails / 7 days', important_only: 'Important updates only', one_email_only: 'One email only' }; return labels[value] || value; }
+      function escapeHtml(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+    })();
+  </script>
+</body>
+</html>

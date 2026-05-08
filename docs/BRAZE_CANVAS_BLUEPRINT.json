@@ -1,0 +1,43 @@
+{
+  "canvas_name": "ORBIT First 7 Days Onboarding Canvas",
+  "entry_event": "submit_waitlist",
+  "target_audience": [
+    "email is not blank",
+    "email_marketing_opt_in = true",
+    "orbit_canvas_candidate = true",
+    "lifecycle_stage = new_explorer",
+    "is_internal_test_user = false"
+  ],
+  "experiment": {
+    "owner": "Braze Canvas",
+    "frontend_randomization": false,
+    "recommended_paths": [
+      {
+        "path": "Treatment",
+        "percentage": 50,
+        "messages": [
+          "day0_welcome",
+          "day2_story_recommendation",
+          "day5_pass_interest"
+        ]
+      },
+      {
+        "path": "Holdout",
+        "percentage": 50,
+        "messages": []
+      }
+    ]
+  },
+  "primary_conversion_event": "view_story",
+  "secondary_conversion_events": [
+    "complete_preference_quiz",
+    "click_membership_cta",
+    "request_pass_invite",
+    "view_market_drop",
+    "add_to_cart",
+    "view_live_event",
+    "rsvp_popup",
+    "view_reward_mission",
+    "complete_mission"
+  ]
+}
